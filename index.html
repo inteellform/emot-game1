@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>Эмоция Лабораториясы - Нақты Мимика</title>
+    <style>
+        :root {
+            --primary: #4834d4;
+            --success: #22a6b3;
+            --bg: #f5f6fa;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .main-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.1);
+            width: 850px;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* КЕЙІПКЕР АЙМАҒЫ */
+        .preview-pane {
+            flex: 1;
+            background: #fdfdfd;
+            border-radius: 30px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #f1f2f6;
+        }
+
+        .emoji-face {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 30% 30%, #ffeb3b, #fbc02d);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(251, 192, 45, 0.3), inset -5px -5px 15px rgba(0,0,0,0.1);
+            border: 3px solid #f9a825;
+        }
+
+        /* Көздер */
+        .eye {
+            width: 34px;
+            height: 42px;
+            background: #2d3436;
+            border-radius: 50%;
+            position: absolute;
+            top: 80px;
+            transition: 0.2s;
+        }
+        .eye.left { left: 55px; }
+        .eye.right { right: 55px; }
+
+        /* Қастар */
+        .eyebrow {
+            width: 50px;
+            height: 12px;
+            background: #2d3436;
+            position: absolute;
+            top: 55px;
+            border-radius: 10px;
+            transition: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .eyebrow.left { left: 45px; }
+        .eyebrow.right { right: 45px; }
+
+        /* Ауыз */
+        .mouth-wrap {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            display: flex;
+            justify-content: center;
+        }
+        .mouth {
+            background: #2d3436;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* БАСҚАРУ ПАНЕЛІ */
+        .controls-pane { flex: 1.2; display: flex; flex-direction: column; gap: 20px; }
+        
+        .mission-card {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .slider-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        label { font-weight: 700; color: #636e72; font-size: 0.85rem; }
+
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: #dfe6e9; border-radius: 5px; outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px;
+            background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid white;
+        }
+
+        .check-btn {
+            padding: 18px; border: none; border-radius: 15px;
+            background: var(--success); color: white; font-weight: 800;
+            font-size: 1rem; cursor: pointer; transition: 0.2s;
+        }
+        .check-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        #status-display {
+            margin-bottom: 15px; font-size: 1.6rem; font-weight: 900;
+            color: var(--primary); text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="preview-pane">
+        <div id="status-display">Бейтарап 😐</div>
+        <div class="emoji-face">
+            <div id="eb-l" class="eyebrow left"></div>
+            <div id="eb-r" class="eyebrow right"></div>
+            <div id="eye-l" class="eye left"></div>
+            <div id="eye-r" class="eye right"></div>
+            <div class="mouth-wrap">
+                <div id="mouth" class="mouth"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-pane">
+        <div class="mission-card" id="mission-text">
+            <b>Тапсырма 1:</b> Сен бүгін мектепте ең қиын есепті шығарып, мұғалімнен мақтау алдың!
+        </div>
+        
+        <div class="slider-box">
+            <label>Қастардың қалыбы</label>
+            <input type="range" id="b-slider" min="-30" max="30" value="0" oninput="updateEmoji()">
+        </div>
+
+        <div class="slider-box">
+            <label>Көздердің ашылуы</label>
+            <input type="range" id="e-slider" min="10" max="50" value="40" oninput="updateEmoji()">
+        </div>
+
+        <div class="slider-box">
+            <label>Ауыздың интонациясы</label>
+            <input type="range" id="m-slider" min="-40" max="40" value="0" oninput="updateEmoji()">
+        </div>
+
+        <button class="check-btn" onclick="checkStep()">ТЕКСЕРУ ✅</button>
+    </div>
+</div>
+
+<script>
+    let step = 0;
+    const missions = [
+        { t: "Қуаныш", d: "<b>Тапсырма 1:</b> Сен бүгін мектепте ең қиын есепті шығарып, мұғалімнен мақтау алдың!" },
+        { t: "Мұң", d: "<b>Тапсырма 2:</b> Досың бүгін ауырып қалып, мектепке келмеді. Сен оны сағындың." },
+        { t: "Ашу", d: "<b>Тапсырма 3:</b> Сен салған әдемі суретті біреу байқаусызда жыртып алды." },
+        { t: "Қорқыныш", d: "<b>Тапсырма 4:</b> Түнде бөлмеңде жалғыз жатқанда оғаш дыбыс естідің." },
+        { t: "Мақтаныш", d: "<b>Тапсырма 5:</b> Сен мектеп атынан жарысқа қатысып, жеңімпаз атандың!" }
+    ];
+
+    function updateEmoji() {
+        const b = parseInt(document.getElementById('b-slider').value);
+        const e = parseInt(document.getElementById('e-slider').value);
+        const m = parseInt(document.getElementById('m-slider').value);
+        const mouth = document.getElementById('mouth');
+        const st = document.getElementById('status-display');
+
+        // Қастардың қозғалысы
+        document.getElementById('eb-l').style.transform = `translateY(${b/2}px) rotate(${-b}deg)`;
+        document.getElementById('eb-r').style.transform = `translateY(${b/2}px) rotate(${b}deg)`;
+
+        // Көздер
+        document.getElementById('eye-l').style.height = e + 'px';
+        document.getElementById('eye-r').style.height = e + 'px';
+
+        let emotion = "Бейтарап 😐";
+
+        // АУЫЗДЫҢ МИМИКАСЫ
+        if (m > 10) {
+            // Күлімдеу
+            mouth.style.width = "90px";
+            mouth.style.height = (m + 5) + "px";
+            mouth.style.borderRadius = "10px 10px 70px 70px";
+            emotion = b < -10 ? "Мақтаныш 😎" : "Қуаныш 😊";
+        } else if (m < -10) {
+            // Мұңайып қабақ түю
+            mouth.style.width = "85px";
+            mouth.style.height = (Math.abs(m) + 5) + "px";
+            mouth.style.borderRadius = "70px 70px 10px 10px";
+            emotion = b > 15 ? "Қорқыныш 😨" : "Мұң 😢";
+        } else {
+            // Түзу (Ашу немесе Бейтарап)
+            mouth.style.width = "75px";
+            mouth.style.height = "10px";
+            mouth.style.borderRadius = "5px";
+            if (b < -15) emotion = "Ашу 😡";
+            if (b > 15) emotion = "Қызығушылық 🤔";
+        }
+
+        st.innerText = emotion;
+    }
+
+    function checkStep() {
+        const current = document.getElementById('status-display').innerText;
+        if (current.includes(missions[step].t)) {
+            alert("Өте дұрыс! Келесі тапсырмаға өт. ✨");
+            step++;
+            if (step < missions.length) {
+                document.getElementById('mission-text').innerHTML = missions[step].d;
+                resetInputs();
+            } else {
+                alert("Құттықтаймыз! Сен барлық тапсырманы сәтті орындадың! 🏆");
+                location.reload();
+            }
+        } else {
+            alert("Мимика тапсырмаға сәйкес келмейді. Қайта байқап көр!");
+        }
+    }
+
+    function resetInputs() {
+        document.getElementById('b-slider').value = 0;
+        document.getElementById('e-slider').value = 40;
+        document.getElementById('m-slider').value = 0;
+        updateEmoji();
+    }
+
+    updateEmoji();
+</script>
+</body>
+</html>
